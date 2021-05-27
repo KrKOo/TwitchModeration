@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+import logo from '../../components/logo.svg';
 import './App.css';
 
 function App() {
@@ -15,7 +15,7 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Random button 
+          Random button
         </a>
       </header>
     </div>
