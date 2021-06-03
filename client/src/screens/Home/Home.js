@@ -1,9 +1,11 @@
 import logo from '../../components/images/logo.svg';
-import './Home.css';
+import './Home.scss';
+import Header from '../../components/Header/Header'
 
 function Home() {
   return (
     <div className="Home">
+      <Header />
       <header className="Home-header">
         <img src={logo} className="Home-logo" alt="logo" />
         <p>
