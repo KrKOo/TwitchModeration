@@ -1,12 +1,12 @@
 import React from 'react';
 import logo from '../../assets/images/logo.svg';
-import './Header.scss';
+import styles from './Header.module.scss';
 
 function Header(props) {
 
   return (
-    <header className="Header">
-      <img src={logo} className="Header-logo" alt="logo" />
+    <header className={styles.Header}>
+      <img src={logo} alt="logo" />
 
       <nav>
         <ul>

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './screens/App/App';
+import Dashboard from './screens/Dashboard/Dashboard';
 import Home from './screens/Home/Home';
 import reportWebVitals from './reportWebVitals';
 import {
@@ -15,8 +15,8 @@ ReactDOM.render(
   <React.StrictMode>
     <Router>
       <Switch>
-        <Route path="/app">
-          <App />
+        <Route path="/dashboard">
+          <Dashboard />
         </Route>
         <Route path="/">
           <Home />
