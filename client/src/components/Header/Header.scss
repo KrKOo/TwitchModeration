@@ -1,2 +1,30 @@
+@import "../../assets/styles/colors";
+
 .Header {
+  background: $dark-2;
+  color: white;
+  position: fixed;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+
+  img {
+    max-width: 55px;
+  }
+
+  nav {
+    display: inline-block;
+
+    ul {
+      margin: 0;
+      li {
+        display: inline-block;
+        padding: 10px 30px;
+        &:hover {
+          color: $primary;
+          cursor: pointer;
+        }
+      }
+    }
+  }
 }

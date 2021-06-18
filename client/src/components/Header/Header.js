@@ -1,28 +1,23 @@
 import React from 'react';
-import logo from '../images/logo.svg';
+import logo from '../../assets/images/logo.svg';
 import './Header.scss';
 
-class Header extends React.Component {
-  handleClick = (e) => {
-    console.log(e);
-  }
+function Header(props) {
 
-  render() {
-    return (
-      <header className="Header">
-        <img src={logo} className="Header-logo" alt="logo" />
+  return (
+    <header className="Header">
+      <img src={logo} className="Header-logo" alt="logo" />
 
-        <nav>
-          <ul>
-            <li onClick={this.handleClick}>Home</li>
-            <li onClick={this.handleClick}>About</li>
-            <li onClick={this.handleClick}>How it works?</li>
-            <li onClick={this.handleClick}>Log In</li>
-          </ul>
-        </nav>
-      </header>
-    );
-  }
+      <nav>
+        <ul>
+          <li onClick={() => props.onClick(0)}>Home</li>
+          <li onClick={() => props.onClick(1)}>About</li>
+          <li onClick={() => props.onClick(2)}>How it works?</li>
+          <li onClick={() => props.onClick(3)}>Log In</li>
+        </ul>
+      </nav>
+    </header>
+  );
 }
 
 export default Header;
