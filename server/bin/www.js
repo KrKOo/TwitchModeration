@@ -7,6 +7,7 @@
 import app from '../app';
 import dbg from 'debug';
 import http from 'http';
+import socketIO from '../modules/sockets';
 
 const debug = dbg('server:server');
 
@@ -30,6 +31,8 @@ const server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+socketIO(server);
 
 /**
  * Normalize a port into a number, string, or false.
