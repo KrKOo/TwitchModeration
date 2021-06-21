@@ -13,10 +13,6 @@ import usersRouter from './routes/users';
 
 const app = express();
 
-const server = http.createServer(app);
-
-socketIO.listen(server);
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
