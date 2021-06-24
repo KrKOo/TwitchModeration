@@ -2,7 +2,7 @@ import React from 'react';
 import logo from '../../assets/images/logo.svg';
 import styles from './Header.module.scss';
 
-function Header(props) {
+function Header (props: {onClick: (buttonID: number) => void}){
 
   return (
     <header className={styles.Header}>
