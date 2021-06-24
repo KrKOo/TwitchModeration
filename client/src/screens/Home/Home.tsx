@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import styles from './Home.module.scss';
 import Header from '../../components/Header/Header'
 import HomeScreen from './Components/HomeScreen/HomeScreen'
@@ -18,13 +18,13 @@ function Home() {
     scrollToScreen(screenID);
   });
 
-  function scrollToScreen(id) {
-    window.scrollTo(0, viewHeight * id);
+  function scrollToScreen(id: number) {
+    window.scrollTo({left: 0, top: viewHeight * id, behavior: 'smooth'});
   }
 
   return (
     <div className={styles.Home}>
-      <Header onClick={setScreenID} />
+      <Header onClick={(buttonID: number) => setScreenID(buttonID)} />
 
       <HomeScreen />
       <AboutScreen />
