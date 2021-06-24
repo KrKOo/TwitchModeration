@@ -2,11 +2,8 @@ import createError from 'http-errors';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
-import http from 'http';
-import dotenv from 'dotenv';
-dotenv.config();
 
-import * as socketIO from './modules/sockets';
+import twitchAPI from './modules/twitch';
 
 import indexRouter from './routes/index';
 import usersRouter from './routes/users';
