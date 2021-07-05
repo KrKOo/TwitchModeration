@@ -38,8 +38,9 @@ socketIO(server);
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val) {
-  const port = parseInt(val, 10);
+function normalizePort(val: string) {
+  // tslint:disable: no-shadowed-variable
+  const port: number  = parseInt(val, 10);
 
   if (isNaN(port)) {
     // named pipe
@@ -58,7 +59,7 @@ function normalizePort(val) {
  * Event listener for HTTP server "error" event.
  */
 
-function onError(error) {
+function onError(error: NodeJS.ErrnoException) {
   if (error.syscall !== 'listen') {
     throw error;
   }
