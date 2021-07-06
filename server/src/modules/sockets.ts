@@ -1,14 +1,19 @@
 import {Server as IOServer, Socket} from 'socket.io';
 
-const connection = (socket: Socket) => {
-  socket.emit('message', { message: "Hello World" });
+const componentMove = (io: IOServer, socket: Socket, data: any) => {
+  socket.broadcast.emit('componentMove', data);
+}
+
+const connection = (io: IOServer, socket: Socket) => {
   console.log("Connect");
+
+  socket.on('componentMove', (data) => componentMove(io, socket, data));
 }
 
 export default function (app: Express.Application) {
-  const io: IOServer = new IOServer(app);
+  const io = new IOServer(app);
 
-  io.on('connection', connection);
+  io.on('connection', (socket) => connection(io, socket));
 
   return io;
 }
