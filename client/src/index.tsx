@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import Dashboard from './screens/Dashboard/Dashboard';
+import Login from './screens/Login/Login';
 import Home from './screens/Home/Home';
 import reportWebVitals from './reportWebVitals';
 import {
@@ -17,6 +18,9 @@ ReactDOM.render(
       <Switch>
         <Route path="/dashboard">
           <Dashboard />
+        </Route>
+        <Route path="/login">
+          <Login />
         </Route>
         <Route path="/">
           <Home />
