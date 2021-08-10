@@ -40,7 +40,7 @@ socketIO(server);
 
 function normalizePort(val: string) {
   // tslint:disable: no-shadowed-variable
-  const port: number  = parseInt(val, 10);
+  const port: number = parseInt(val, 10);
 
   if (isNaN(port)) {
     // named pipe
@@ -64,9 +64,7 @@ function onError(error: NodeJS.ErrnoException) {
     throw error;
   }
 
-  const bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
@@ -89,8 +87,9 @@ function onError(error: NodeJS.ErrnoException) {
 
 function onListening() {
   const addr = server.address();
-  const bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  if (addr) {
+    const bind =
+      typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+    debug('Listening on ' + bind);
+  }
 }
