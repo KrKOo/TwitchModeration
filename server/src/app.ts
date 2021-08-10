@@ -3,9 +3,8 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 
-import twitchAPI from './modules/twitch';
-
 import indexRouter from './routes/index';
+import authRouter from './routes/auth';
 import usersRouter from './routes/users';
 
 const app = express();
@@ -16,6 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use('/', indexRouter);
+app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
@@ -31,7 +31,7 @@ app.use((err: any, req: any, res: any, next: any) => {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.send('Error');
 });
 
 export default app;
