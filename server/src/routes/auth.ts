@@ -1,7 +1,9 @@
 import express from 'express';
-import { JwtPayload } from 'jsonwebtoken';
+import knex from 'database';
+import { transaction } from 'objection';
 
 import { AuthParams, TwitchAuth } from 'modules/authentication';
+import { User, Identity } from 'models';
 
 const router = express.Router();
 
@@ -16,18 +18,45 @@ const twitchParams: AuthParams = {
 
 const twitchAuth = new TwitchAuth(twitchParams);
 
-router.get('/twitch', (req, res, next) => {
+router.get('/twitch', async (req, res, next) => {
   console.log(req.query.code);
   console.log(req.query.scope);
-  if (!req.query.code) return;
-  twitchAuth
-    .getPayload(req.query.code as string)
-    .then((payload: JwtPayload | undefined) => {
-      console.log(payload);
-    })
-    .catch((err: any) => {
-      console.error(err);
+  if (!req.query.code) {
+    return next({ status: 400 });
+  }
+
+  const payload = await twitchAuth.getPayload(req.query.code as string);
+  if (!payload) {
+    return next({ status: 400 });
+  }
+
+  try {
+    await transaction(User, async (userModel) => {
+      const user = await userModel
+        .query()
+        .insert({
+          username: payload?.preferred_username,
+          email: payload?.email,
+          picture: payload?.picture,
+          last_login: knex.fn.now(),
+        })
+        .onConflict('email')
+        .merge();
+
+      await user
+        .$relatedQuery('identity')
+        .insert({
+          provider: 1,
+          access_token: payload?.access_token,
+          refresh_token: payload?.refresh_token,
+          expires_at: knex.raw('? + ?', [knex.fn.now(), payload.expires_in]),
+        })
+        .onConflict(['id_user', 'provider'])
+        .merge();
     });
+  } catch (err) {
+    console.error(err);
+  }
 
   if (process.env.LOGIN_REDIRECT_URL)
     res.redirect(process.env.LOGIN_REDIRECT_URL);

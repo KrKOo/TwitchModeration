@@ -8,7 +8,7 @@
     "build": "tsc",
     "prestart": "npm run build",
     "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register -r dotenv/config dist/bin/www.js dotenv_config_path=.env.production",
-    "dev": "nodemon --config nodemon.json -r tsconfig-paths/register -r dotenv/config src/bin/www.ts dotenv_config_path=.env.development",
+    "dev": "nodemon --config nodemon.json -r tsconfig-paths/register -r dotenv/config src/bin/www.ts dotenv_config_path=.env.development --delay 1500ms",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -24,9 +24,10 @@
     "jade": "~1.11.0",
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^2.0.4",
-    "knex": "^0.95.7",
+    "knex": "^0.21.21",
     "morgan": "~1.9.1",
     "node-fetch": "^2.6.1",
+    "objection": "^2.2.15",
     "pg": "^8.6.0",
     "socket.io": "^4.1.2",
     "twitch": "^4.5.5"
