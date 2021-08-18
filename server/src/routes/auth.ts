@@ -1,6 +1,7 @@
 import express from 'express';
 import knex from 'database';
 import { transaction } from 'objection';
+import jwt from 'jsonwebtoken';
 
 import { AuthParams, TwitchAuth } from 'modules/authentication';
 import { User, Identity } from 'models';
@@ -19,20 +20,19 @@ const twitchParams: AuthParams = {
 const twitchAuth = new TwitchAuth(twitchParams);
 
 router.get('/twitch', async (req, res, next) => {
-  console.log(req.query.code);
-  console.log(req.query.scope);
   if (!req.query.code) {
-    return next({ status: 400 });
+    return res.status(400).send('Invalid authentication code');
   }
 
   const payload = await twitchAuth.getPayload(req.query.code as string);
   if (!payload) {
-    return next({ status: 400 });
+    return res.status(400).send('Invalid authentication code');
   }
 
+  let user: any;
   try {
     await transaction(User, async (userModel) => {
-      const user = await userModel
+      user = await userModel
         .query()
         .insert({
           username: payload?.preferred_username,
@@ -41,7 +41,8 @@ router.get('/twitch', async (req, res, next) => {
           last_login: knex.fn.now(),
         })
         .onConflict('email')
-        .merge();
+        .merge()
+        .returning(['id', 'uuid']);
 
       await user
         .$relatedQuery('identity')
@@ -55,11 +56,31 @@ router.get('/twitch', async (req, res, next) => {
         .merge();
     });
   } catch (err) {
-    console.error(err);
+    return next(err);
   }
 
+  if (!process.env.JWT_TOKEN_KEY) {
+    return next(new Error('No JWT token key specified'));
+  }
+
+  const token = jwt.sign(
+    {
+      uuid: user.uuid,
+    },
+    process.env.JWT_TOKEN_KEY,
+    {
+      expiresIn: '2h',
+    }
+  );
+
   if (process.env.LOGIN_REDIRECT_URL)
-    res.redirect(process.env.LOGIN_REDIRECT_URL);
+    return res
+      .cookie('access-token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+      })
+      .status(200)
+      .redirect(process.env.LOGIN_REDIRECT_URL);
 });
 
 export default router;

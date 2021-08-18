@@ -1,8 +1,10 @@
 import Knex from 'knex';
 
 export const up = async (knex: Knex): Promise<void> => {
+  await knex.raw('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
   return knex.schema.createTable('user', (table) => {
-    table.increments();
+    table.increments('id');
+    table.uuid('uuid').notNullable().defaultTo(knex.raw('uuid_generate_v4()'));
     table.string('username').notNullable();
     table.string('email').notNullable().unique();
     table.string('picture');
