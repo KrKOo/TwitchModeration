@@ -5,9 +5,13 @@ import HomeScreen from './Components/HomeScreen/HomeScreen'
 import AboutScreen from './Components/AboutScreen/AboutScreen';
 import HowItWorksScreen from './Components/HowItWorksScreen/HowItWorksScreen';
 
-function Home() {
+const Home = () => {
   const [viewHeight, setViewHeight] = React.useState(window.innerHeight);
   const [screenID, setScreenID] = React.useState(0);
+
+  const scrollToScreen = (id: number) => {
+    window.scrollTo({ left: 0, top: viewHeight * id, behavior: 'smooth' });
+  }
 
   React.useEffect(() => {
     function handleResize() {
@@ -18,9 +22,6 @@ function Home() {
     scrollToScreen(screenID);
   });
 
-  function scrollToScreen(id: number) {
-    window.scrollTo({left: 0, top: viewHeight * id, behavior: 'smooth'});
-  }
 
   return (
     <div className={styles.Home}>
