@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './StreamOverlay.module.scss';
-import { SocketContext } from 'modules/socket-context'
+import { SocketContext } from 'modules/context/socketContext'
 import thumbnail from 'assets/images/thumbnail.png'
 
 import OverlayItem from 'screens/Dashboard/Components/OverlayItem/OverlayItem'

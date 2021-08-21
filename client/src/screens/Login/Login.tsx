@@ -8,14 +8,12 @@ const Login = () => {
   if (clientID) {
     params = {
       client_id: clientID,
-      redirect_uri: 'http://localhost:3002/auth/twitch',
+      redirect_uri: process.env.REACT_APP_TWITCH_REDIRECT_URI,
       response_type: 'code',
       scope: 'user:read:email openid',
       claims: `{ "id_token": { "email": null, "email_verified": null, "preferred_username": null, "picture": null }, "userinfo": { "picture": null } }`
     }
   }
-
-  console.log(`https://id.twitch.tv/oauth2/authorize?${new URLSearchParams(params)}`)
 
   return (
     <div className={styles.Login}>
