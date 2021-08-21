@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
 import styles from './Login.module.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTwitch, faGoogle, faFacebook } from '@fortawesome/free-brands-svg-icons'
 
 const Login = () => {
   let params: any;
@@ -17,7 +18,14 @@ const Login = () => {
 
   return (
     <div className={styles.Login}>
-      <a href={`https://id.twitch.tv/oauth2/authorize?${new URLSearchParams(params)}`}>Log IN</a>
+      <div className={styles.LoginForm}>
+        <h1>Login</h1>
+        <ul>
+          <li><a href={`https://id.twitch.tv/oauth2/authorize?${new URLSearchParams(params)}`} className={styles.Twitch}><FontAwesomeIcon icon={faTwitch} /> Log in with Twitch</a></li>
+          <li><a href={`https://id.twitch.tv/oauth2/authorize?${new URLSearchParams(params)}`} className={styles.Google}><FontAwesomeIcon icon={faGoogle} /> Log in with Google</a></li>
+          <li><a href={`https://id.twitch.tv/oauth2/authorize?${new URLSearchParams(params)}`} className={styles.Facebook}><FontAwesomeIcon icon={faFacebook} /> Log in with Facebook</a></li>
+        </ul>
+      </div>
     </div >
   );
 }

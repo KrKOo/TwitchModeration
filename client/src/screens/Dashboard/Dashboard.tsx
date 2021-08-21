@@ -4,7 +4,7 @@ import StreamOverlay from './Components/StreamOverlay/StreamOverlay';
 import UserContext from 'modules/context/userContext';
 
 function Dashboard() {
-  const user = React.useContext(UserContext)
+  const { user } = React.useContext(UserContext)
 
   return (
     <div className={styles.Dashboard}>
