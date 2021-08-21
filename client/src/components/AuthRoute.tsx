@@ -1,7 +1,6 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useContext } from 'react';
 import { Redirect, Route } from 'react-router-dom';
-import UserContext, { UserState } from 'modules/context/userContext';
-import Loading from 'screens/Loading/Loading';
+import UserContext from 'modules/context/userContext';
 
 interface AuthRouteProps {
   path: string;
@@ -9,47 +8,11 @@ interface AuthRouteProps {
 }
 
 const AuthRoute = (props: AuthRouteProps) => {
-  const [user, setUser] = useState<UserState>({ isLogged: false });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let isMounted = true;
-    const fetchUserInfo = async () => {
-      try {
-        const res = await fetch('/userinfo');
-        if (res.ok) {
-          const userInfo = await res.json();
-          if (isMounted) {
-            setUser({
-              isLogged: true,
-              username: userInfo.username,
-              picture: userInfo.picture,
-            });
-          }
-        }
-        else {
-          isMounted && setUser({ isLogged: false })
-        }
-        isMounted && setLoading(false)
-      }
-      catch (e) {
-        console.error(e)
-      }
-    }
-
-    fetchUserInfo();
-
-    return () => { isMounted = false }
-  }, []);
-
-
-  if (loading) {
-    return <Loading />;
-  }
+  const { user } = useContext(UserContext);
 
   if (user.isLogged) {
     return <Route path={props.path}>
-      <UserContext.Provider value={user}>{props.children}</UserContext.Provider>
+      {props.children}
     </Route>
   }
 

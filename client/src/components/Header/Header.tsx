@@ -1,8 +1,11 @@
-import React from 'react';
+import UserContext from 'modules/context/userContext';
+import { useContext } from 'react';
+import { Link } from 'react-router-dom';
 import logo from '../../assets/images/logo.svg';
 import styles from './Header.module.scss';
 
-function Header (props: {onClick: (buttonID: number) => void}){
+const Header = (props: { onClick: (buttonID: number) => void }) => {
+  const { user } = useContext(UserContext)
 
   return (
     <header className={styles.Header}>
@@ -10,10 +13,11 @@ function Header (props: {onClick: (buttonID: number) => void}){
 
       <nav>
         <ul>
-          <li onClick={() => props.onClick(0)}>Home</li>
-          <li onClick={() => props.onClick(1)}>About</li>
-          <li onClick={() => props.onClick(2)}>How it works?</li>
-          <li onClick={() => props.onClick(3)}>Log In</li>
+          {user.isLogged && <li><Link to="/dashboard" className={styles.LoginButton}>Dashboard</Link></li>}
+          <li><button onClick={() => props.onClick(0)}>Home</button></li>
+          <li><button onClick={() => props.onClick(1)}>About</button></li>
+          <li><button onClick={() => props.onClick(2)}>How it works?</button></li>
+          <li><Link to="/login" className={styles.LoginButton}>Log In</Link></li>
         </ul>
       </nav>
     </header>

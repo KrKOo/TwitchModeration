@@ -1,11 +1,19 @@
 import React from 'react';
 
-export interface UserState {
+export interface User {
   username?: string;
   picture?: string;
   isLogged: boolean;
 }
 
-const UserContext = React.createContext({ isLogged: false } as UserState);
+export interface UserState {
+  user: User;
+  setUser: (user: User) => void;
+}
+
+const UserContext = React.createContext<UserState>({
+  user: { isLogged: false },
+  setUser: () => {},
+});
 
 export default UserContext;

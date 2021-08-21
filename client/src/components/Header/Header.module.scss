@@ -1,8 +1,8 @@
-@import "../../assets/styles/colors";
+@import '../../assets/styles/colors';
 
 .Header {
   background: $dark-2;
-  color: white;
+  color: $font-1;
   position: fixed;
   top: 0;
   width: 100%;
@@ -20,12 +20,25 @@
       margin: 0;
       li {
         display: inline-block;
-        padding: 10px 30px;
-        &:hover {
-          color: $primary;
-          cursor: pointer;
+        color: $font-1;
+        * {
+          font-size: 1.05em;
+          border: none;
+          padding: 10px 30px;
+          color: $font-1;
+          text-decoration: none;
+          background: none;
+
+          &:hover {
+            color: $primary;
+            cursor: pointer;
+          }
         }
       }
     }
   }
+}
+
+.LoginButton {
+  background: $primary !important;
 }
