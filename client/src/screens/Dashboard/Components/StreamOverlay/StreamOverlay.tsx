@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import styles from './StreamOverlay.module.scss';
 import { SocketContext } from 'modules/context/socketContext'
 import thumbnail from 'assets/images/thumbnail.png'
@@ -7,28 +7,29 @@ import OverlayItem from 'screens/Dashboard/Components/OverlayItem/OverlayItem'
 import { useNoRenderRef } from 'modules/hooks';
 
 interface Item {
-  id: number,
+  id: number;
   position: {
     x: number,
     y: number
   },
+  rotation: number;
   size: {
     width: number,
     height: number
-  },
-  ref: React.RefObject<HTMLDivElement>
+  };
+  ref: React.RefObject<HTMLDivElement>;
 }
 
 function StreamOverlay() {
   const initialState = [
+    // {
+    //   id: 0, position: { x: 0, y: 0 }, size: { width: 100, height: 100 }, ref: React.useRef<HTMLDivElement>(null)
+    // },
+    // {
+    //   id: 1, position: { x: 100, y: 0 }, size: { width: 100, height: 100 }, ref: React.useRef<HTMLDivElement>(null)
+    // },
     {
-      id: 0, position: { x: 0, y: 0 }, size: { width: 100, height: 100 }, ref: React.useRef<HTMLDivElement>(null)
-    },
-    {
-      id: 1, position: { x: 100, y: 0 }, size: { width: 100, height: 100 }, ref: React.useRef<HTMLDivElement>(null)
-    },
-    {
-      id: 2, position: { x: 0, y: 0 }, size: { width: 100, height: 100 }, ref: React.useRef<HTMLDivElement>(null)
+      id: 2, position: { x: 0, y: 0 }, rotation: 0, size: { width: 100, height: 100 }, ref: React.useRef<HTMLDivElement>(null)
     }]
 
   const [items, setItems] = React.useState<Item[]>(initialState);
@@ -41,11 +42,17 @@ function StreamOverlay() {
   const overlayRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    socket.on("componentMove", data => {
+    socket.on("componentTransform", data => {
       const index = itemsNoRenderRef.current.findIndex((item: Item) => item.id === data.id);
       if (index !== -1) {
+        console.log(data)
         setItems(prevItems => {
-          prevItems[index].position = data.position;
+          if (data.rotation)
+            prevItems[index].rotation = data.rotation;
+
+          if (data.position)
+            prevItems[index].position = data.position;
+
           return [...prevItems]
         });
       }
@@ -53,7 +60,7 @@ function StreamOverlay() {
   }, [socket, itemsNoRenderRef]);
 
   const onItemDrag = (id: number, position: { x: number, y: number }) => {
-    socket.emit("componentMove", { id: id, position: position });
+    socket.emit("componentTransform", { id: id, position: position });
   }
 
   const onItemDragStop = (id: number, position: { x: number, y: number }) => {
@@ -66,6 +73,21 @@ function StreamOverlay() {
     }
   }
 
+  const onItemRotate = useCallback((id: number, deg: number) => {
+    socket.emit("componentTransform", { id: id, rotation: deg });
+  }, [socket])
+
+  const onItemRotateStop = useCallback((id: number, deg: number) => {
+    console.log("STOP")
+    const index = itemsNoRenderRef.current.findIndex((item: Item) => item.id === id);
+    if (index !== -1) {
+      setItems(prevItems => {
+        prevItems[index].rotation = deg;
+        return [...prevItems]
+      });
+    }
+  }, [itemsNoRenderRef])
+
   return (
     <div className={styles.StreamOverlay} ref={overlayRef}>
       {items.map((item) =>
@@ -73,11 +95,14 @@ function StreamOverlay() {
           key={item.id}
           id={item.id}
           position={item.position}
+          rotation={item.rotation}
           relativeSize={item.size}
           containerResolution={streamResolution}
           containerRef={overlayRef}
           onDrag={onItemDrag}
-          onStop={onItemDragStop}
+          onDragStop={onItemDragStop}
+          onRotate={onItemRotate}
+          onRotateStop={onItemRotateStop}
           ref={item.ref}
         />
       )}

@@ -1,0 +1,14 @@
+.Rotatable {
+  transform-origin: center;
+}
+
+.Handle {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%);
+  top: -15px;
+  background: green;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}

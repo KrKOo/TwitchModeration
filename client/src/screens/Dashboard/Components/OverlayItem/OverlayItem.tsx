@@ -1,25 +1,31 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import Draggable, { DraggableEvent, DraggableData } from 'react-draggable';
+import Rotatable, { RotatableEvent } from 'components/Rotatable/Rotatable'
 import { useWindowSize, useNoRenderRef } from 'modules/hooks'
 import { Size, Position } from 'modules/types'
 
 interface ItemProps {
-  id: number,
+  id: number;
   position: {
     x: number,
     y: number
-  },
+  };
   relativeSize: {
     width: number,
     height: number
-  },
-  containerResolution: { width: number, height: number }
-  containerRef: React.RefObject<HTMLDivElement>,
-  onDrag?: (id: number, position: { x: number, y: number }) => void,
-  onStop?: (id: number, position: { x: number, y: number }) => void,
+  };
+  rotation: number;
+  containerResolution: { width: number, height: number };
+  containerRef: React.RefObject<HTMLDivElement>;
+  onDrag?: (id: number, position: { x: number, y: number }) => void;
+  onDragStop?: (id: number, position: { x: number, y: number }) => void;
+  onRotate?: (id: number, deg: number) => void;
+  onRotateStop?: (id: number, deg: number) => void;
 }
 
 const StreamOverlay = React.forwardRef<HTMLDivElement, ItemProps>((props: ItemProps, ref) => {
+  const { onDrag: onDragProp, onDragStop: onDragStopProp, onRotate: onRotateProp, onRotateStop: onRotateStopProp } = props;
+
   const [size, setSize] = React.useState<Size>({ width: 0, height: 0 });
   const [position, setPosition] = React.useState<Position>({ x: 0, y: 0 });
   const [containerSize, setContainerSize] = React.useState({ ...props.containerResolution });
@@ -87,28 +93,36 @@ const StreamOverlay = React.forwardRef<HTMLDivElement, ItemProps>((props: ItemPr
     });
   }
 
-  const getRelativeItemPosition = (absolutePosition: Position) => {
+  const getRelativeItemPosition = useCallback((absolutePosition: Position) => {
     const container = getRefParameters(props.containerRef);
     if (container.size) {
       return changeResolution(absolutePosition, container.size, props.containerResolution);
     }
-  }
+  }, [props.containerRef, props.containerResolution])
 
-  const onDrag = (e: DraggableEvent, d: DraggableData) => {
+  const onDrag = useCallback((e: DraggableEvent, d: DraggableData) => {
     setPosition({ x: d.x, y: d.y })
 
-    if (props.onDrag) {
+    if (onDragProp) {
       const relativeItemPos = getRelativeItemPosition({ x: d.x, y: d.y });
-      relativeItemPos && props.onDrag(props.id, relativeItemPos);
+      relativeItemPos && onDragProp(props.id, relativeItemPos);
     }
-  }
+  }, [getRelativeItemPosition, onDragProp, props.id])
 
-  const onStop = (e: DraggableEvent, d: DraggableData) => {
-    if (props.onStop) {
+  const onStop = useCallback((e: DraggableEvent, d: DraggableData) => {
+    if (onDragStopProp) {
       const relativeItemPos = getRelativeItemPosition({ x: d.x, y: d.y });
-      relativeItemPos && props.onStop(props.id, relativeItemPos);
+      relativeItemPos && onDragStopProp(props.id, relativeItemPos);
     }
-  }
+  }, [getRelativeItemPosition, onDragStopProp, props.id])
+
+  const onRotate = useCallback((e: RotatableEvent) => {
+    onRotateProp && onRotateProp(props.id, e.deg);
+  }, [onRotateProp, props.id]);
+
+  const onRotateStop = useCallback((e: RotatableEvent) => {
+    onRotateStopProp && onRotateStopProp(props.id, e.deg)
+  }, [onRotateStopProp, props.id]);
 
   return (
     <Draggable
@@ -116,9 +130,13 @@ const StreamOverlay = React.forwardRef<HTMLDivElement, ItemProps>((props: ItemPr
       nodeRef={ref as React.RefObject<HTMLDivElement>}
       onDrag={onDrag}
       onStop={onStop}
-      position={position}>
-      <div ref={ref} style={{ width: size?.width, height: size?.height, background: "red", position: 'absolute' }}></div>
-    </Draggable>
+      handle='.drag-handle'
+      position={position} >
+
+      <Rotatable ref={ref} rotation={props.rotation} onRotate={onRotate} onStop={onRotateStop}>
+        <div className='drag-handle' style={{ position: 'relative', width: size.width, height: size.height, background: 'red' }}></div>
+      </Rotatable>
+    </Draggable >
   );
 });
 
