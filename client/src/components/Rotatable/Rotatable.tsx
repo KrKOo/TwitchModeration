@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef, useState } from 'react'
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import styles from './Rotatable.module.scss'
 
 export interface RotatableEvent {
@@ -17,25 +17,12 @@ const Rotatable = React.forwardRef((props: RotatableProps, ref: React.ForwardedR
   const { children, rotation: rotationProp, onRotate, onStop, ...rest } = props;
 
   const [rotation, setRotation] = useState(rotationProp || 0);
-  const mousePos = { x: undefined, y: undefined }
+  const mousePos = useMemo(() => { return ({ x: undefined, y: undefined }) }, [])
 
   const latestRotation = useRef(rotation);
-  let rotating = false;
+  let rotating = useRef(false);
 
-  document.addEventListener('mouseup', (e) => {
-    if (rotating) {
-      onStop && onStop({ deg: latestRotation.current })
-      document.removeEventListener('mousemove', mouseMove);
-      rotating = false
-    }
-  })
-
-  useEffect(() => {
-    if (rotationProp)
-      setRotation(rotationProp as number);
-  }, [rotationProp]);
-
-  const mouseMove = (e: any) => {
+  const mouseMove = useCallback((e: any) => {
     let deg: number;
     if (mousePos.x !== undefined && mousePos.y !== undefined) {
       setRotation((prevRotation) => {
@@ -50,13 +37,36 @@ const Rotatable = React.forwardRef((props: RotatableProps, ref: React.ForwardedR
 
     mousePos.x = e.clientX
     mousePos.y = e.clientY
-  }
+  }, [mousePos, onRotate])
+
+  const handleMouseUp = useCallback((e: any) => {
+    if (rotating.current) {
+      onStop && onStop({ deg: latestRotation.current })
+      document.removeEventListener('mousemove', mouseMove);
+      rotating.current = false
+      mousePos.x = undefined;
+      mousePos.y = undefined;
+    }
+  }, [mouseMove, mousePos, onStop]);
 
   const handleMouseDown = (e: any) => {
     e.preventDefault();
     document.addEventListener('mousemove', mouseMove);
-    rotating = true;
+    rotating.current = true;
   }
+
+  useEffect(() => {
+    document.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [handleMouseUp]);
+
+  useEffect(() => {
+    if (rotationProp)
+      setRotation(rotationProp as number);
+  }, [rotationProp]);
+
 
   rest.className += ` ${styles.Rotatable}`
 
@@ -68,3 +78,5 @@ const Rotatable = React.forwardRef((props: RotatableProps, ref: React.ForwardedR
 });
 
 export default Rotatable;
+
+
