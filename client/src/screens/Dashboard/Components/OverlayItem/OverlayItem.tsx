@@ -3,6 +3,7 @@ import Draggable, { DraggableEvent, DraggableData } from 'react-draggable';
 import Rotatable, { RotatableEvent } from 'components/Rotatable/Rotatable'
 import { useWindowSize, useNoRenderRef } from 'modules/hooks'
 import { Size, Position } from 'modules/types'
+import Resizable from 'components/Resizable/Resizable';
 
 interface ItemProps {
   id: number;
@@ -133,7 +134,9 @@ const StreamOverlay = React.forwardRef<HTMLDivElement, ItemProps>((props: ItemPr
       position={position}>
 
       <Rotatable ref={ref} rotation={props.rotation} onRotate={onRotate} onStop={onRotateStop}>
-        <div ref={ref} style={{ background: 'red', width: '100px', height: '100px', position: 'absolute' }}></div>
+        <Resizable width={size.width} height={size.height}>
+          <div style={{ position: 'relative', background: 'red' }}></div>
+        </Resizable>
       </Rotatable>
     </Draggable >
   );

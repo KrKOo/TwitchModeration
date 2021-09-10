@@ -1,0 +1,36 @@
+.Resizable {
+  background: green;
+}
+
+.Edge {
+  position: absolute;
+  background: red;
+}
+
+.topEdge {
+  top: 0;
+  height: 5px;
+  width: 100%;
+  cursor: ns-resize;
+}
+
+.bottomEdge {
+  bottom: 0;
+  height: 5px;
+  width: 100%;
+  cursor: ns-resize;
+}
+
+.rightEdge {
+  right: 0;
+  height: 100%;
+  width: 5px;
+  cursor: ew-resize;
+}
+
+.leftEdge {
+  left: 0;
+  height: 100%;
+  width: 5px;
+  cursor: ew-resize;
+}
