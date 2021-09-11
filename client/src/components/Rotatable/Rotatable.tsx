@@ -51,6 +51,7 @@ const Rotatable = React.forwardRef((props: RotatableProps, ref: React.ForwardedR
 
   const handleMouseDown = (e: any) => {
     e.preventDefault();
+    e.stopPropagation();
     document.addEventListener('mousemove', mouseMove);
     rotating.current = true;
   }
@@ -67,14 +68,24 @@ const Rotatable = React.forwardRef((props: RotatableProps, ref: React.ForwardedR
       setRotation(rotationProp as number);
   }, [rotationProp]);
 
+  let newElement: any;
+  if (React.isValidElement(children)) {
+    rest.className += ` ${children.props.className || ''} ${styles.Rotatable || ''}`
 
-  rest.className += ` ${styles.Rotatable}`
+    newElement = React.cloneElement(children, {
+      ref: ref,
+      ...rest,
+      style: {
+        ...rest?.style,
+        ...children.props.style,
+        ...{ transform: `${rest?.style?.transform || ''} ${children.props.style?.tranform || ''} rotate(${rotation}deg)` }
+      },
+      children: <div className={styles.Handle} onMouseDown={handleMouseDown}></div>
 
-  return <div ref={ref} {...rest} style={{ ...rest.style, ...{ position: 'absolute', transform: rest.style.transform + `rotate(${rotation}deg)` } }} >
-    <div className={styles.Handle} onMouseDown={handleMouseDown} ></div>
+    })
+  }
 
-    {props.children}
-  </div >
+  return newElement
 });
 
 export default Rotatable;

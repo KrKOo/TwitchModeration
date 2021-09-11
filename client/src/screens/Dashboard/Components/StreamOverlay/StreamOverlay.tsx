@@ -45,7 +45,6 @@ function StreamOverlay() {
     socket.on("componentTransform", data => {
       const index = itemsNoRenderRef.current.findIndex((item: Item) => item.id === data.id);
       if (index !== -1) {
-        console.log(data)
         setItems(prevItems => {
           if (data.rotation)
             prevItems[index].rotation = data.rotation;
@@ -78,7 +77,6 @@ function StreamOverlay() {
   }, [socket])
 
   const onItemRotateStop = useCallback((id: number, deg: number) => {
-    console.log("STOP")
     const index = itemsNoRenderRef.current.findIndex((item: Item) => item.id === id);
     if (index !== -1) {
       setItems(prevItems => {

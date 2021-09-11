@@ -130,11 +130,10 @@ const StreamOverlay = React.forwardRef<HTMLDivElement, ItemProps>((props: ItemPr
       nodeRef={ref as React.RefObject<HTMLDivElement>}
       onDrag={onDrag}
       onStop={onStop}
-      handle='.drag-handle'
-      position={position} >
+      position={position}>
 
       <Rotatable ref={ref} rotation={props.rotation} onRotate={onRotate} onStop={onRotateStop}>
-        <div className='drag-handle' style={{ position: 'relative', width: size.width, height: size.height, background: 'red' }}></div>
+        <div ref={ref} style={{ background: 'red', width: '100px', height: '100px', position: 'absolute' }}></div>
       </Rotatable>
     </Draggable >
   );
