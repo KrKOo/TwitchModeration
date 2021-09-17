@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import styles from './Rotatable.module.scss'
 
 export interface RotatableEvent {
@@ -7,14 +7,15 @@ export interface RotatableEvent {
 
 export interface RotatableProps {
   children?: ReactNode;
-  rotation?: number
+  rotation?: number;
+  nodeRef?: React.RefObject<HTMLDivElement>;
   onRotate?: (e: RotatableEvent) => void;
   onStop?: (e: RotatableEvent) => void;
   [rest: string]: any;
 };
 
-const Rotatable = React.forwardRef((props: RotatableProps, ref: React.ForwardedRef<HTMLDivElement>) => {
-  const { children, rotation: rotationProp, onRotate, onStop, ...rest } = props;
+const Rotatable = (props: RotatableProps) => {
+  const { children, rotation: rotationProp, onRotate, onStop, nodeRef, ...rest } = props;
 
   const [rotation, setRotation] = useState(rotationProp || 0);
   const mousePos = useMemo(() => { return ({ x: undefined, y: undefined }) }, [])
@@ -72,21 +73,22 @@ const Rotatable = React.forwardRef((props: RotatableProps, ref: React.ForwardedR
   if (React.isValidElement(children)) {
     rest.className += ` ${children.props.className || ''} ${styles.Rotatable || ''}`
 
+
     newElement = React.cloneElement(children, {
-      ref: ref,
       ...rest,
       style: {
         ...rest?.style,
         ...children.props.style,
         ...{ transform: `${rest?.style?.transform || ''} ${children.props.style?.tranform || ''} rotate(${rotation}deg)` }
       },
-      children: <div className={styles.Handle} onMouseDown={handleMouseDown}></div>
 
     })
   }
 
+  console.log(nodeRef)
+
   return newElement
-});
+};
 
 export default Rotatable;
 

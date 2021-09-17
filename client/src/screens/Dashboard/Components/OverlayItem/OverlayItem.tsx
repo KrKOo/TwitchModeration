@@ -133,9 +133,9 @@ const StreamOverlay = React.forwardRef<HTMLDivElement, ItemProps>((props: ItemPr
       onStop={onStop}
       position={position}>
 
-      <Rotatable ref={ref} rotation={props.rotation} onRotate={onRotate} onStop={onRotateStop}>
-        <Resizable width={size.width} height={size.height}>
-          <div style={{ position: 'relative', background: 'red' }}></div>
+      <Rotatable nodeRef={ref as React.RefObject<HTMLDivElement>} rotation={props.rotation} onRotate={onRotate} onStop={onRotateStop}>
+        <Resizable nodeRef={ref as React.RefObject<HTMLDivElement>}>
+          <div ref={ref} style={{ position: 'absolute', background: 'red', width: '100px', height: '100px' }}></div>
         </Resizable>
       </Rotatable>
     </Draggable >
