@@ -23,6 +23,9 @@ export class TwitchAuth extends Authentication {
           delete data.id_token;
           return { ...payload, ...data } as AuthPayload;
         }
+      })
+      .catch((e) => {
+        console.error(e);
       });
   }
 

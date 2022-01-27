@@ -29,7 +29,7 @@ export default abstract class Authentication {
 
   public abstract getPayload(
     authCode: string
-  ): Promise<AuthPayload | undefined>;
+  ): Promise<AuthPayload | void | undefined>;
 
   protected abstract fetchData(authCode: string): Promise<JSON>;
 
