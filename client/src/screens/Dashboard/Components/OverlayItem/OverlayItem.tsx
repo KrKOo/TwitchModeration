@@ -1,143 +1,29 @@
-import React, { useCallback } from 'react';
-import Draggable, { DraggableEvent, DraggableData } from 'react-draggable';
-import Rotatable, { RotatableEvent } from 'components/Rotatable/Rotatable'
+import React, { useCallback, useEffect, useState } from 'react';
 import { useWindowSize, useNoRenderRef } from 'modules/hooks'
-import { Size, Position } from 'modules/types'
+import FreeTransform from 'react-free-transform'
+import './OverlayItem.scss'
 
-interface ItemProps {
+export interface OverlayItemProps {
   id: number;
-  position: {
-    x: number,
-    y: number
-  };
-  relativeSize: {
-    width: number,
-    height: number
-  };
-  rotation: number;
-  containerResolution: { width: number, height: number };
-  containerRef: React.RefObject<HTMLDivElement>;
-  onDrag?: (id: number, position: { x: number, y: number }) => void;
-  onDragStop?: (id: number, position: { x: number, y: number }) => void;
-  onRotate?: (id: number, deg: number) => void;
-  onRotateStop?: (id: number, deg: number) => void;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  scaleX: number;
+  scaleY: number;
+  angle: number;
+  offsetX: number;
+  offsetY: number;
+  onUpdate?: (id: number, payload: any) => void;
 }
 
-const StreamOverlay = React.forwardRef<HTMLDivElement, ItemProps>((props: ItemProps, ref) => {
-  const { onDrag: onDragProp, onDragStop: onDragStopProp, onRotate: onRotateProp, onRotateStop: onRotateStopProp } = props;
+const OverlayItem = (props: OverlayItemProps) => {
+  return <FreeTransform
+    {...props}
+    onUpdate={(payload: any) => { if (props.onUpdate) props.onUpdate(props.id, payload) }}
+  >
+    <div style={{ background: 'red', width: '100%', height: '100%' }}></div>
+  </FreeTransform >
+}
 
-  const [size, setSize] = React.useState<Size>({ width: 0, height: 0 });
-  const [position, setPosition] = React.useState<Position>({ x: 0, y: 0 });
-  const [containerSize, setContainerSize] = React.useState({ ...props.containerResolution });
-
-  const sizeNoRenderRef = useNoRenderRef(size);
-  const positionNoRenderRef = useNoRenderRef(position);
-  const containerSizeNoRenderRef = useNoRenderRef(containerSize);
-
-  const windowSize = useWindowSize()
-
-  React.useEffect(() => {
-    const container = getRefParameters(props.containerRef);
-    if (!container.size) return;
-
-    const itemAbsoluteSize = changeResolution(
-      { x: sizeNoRenderRef.current.width, y: sizeNoRenderRef.current.height },
-      containerSizeNoRenderRef.current,
-      container.size
-    );
-    const itemAbsolutePosition = changeResolution(positionNoRenderRef.current, containerSizeNoRenderRef.current, container.size);
-
-    setContainerSize(prevState => ({ ...prevState, width: container.size.width, height: container.size.height }))
-    itemAbsoluteSize && setSize((prevState) => ({ ...prevState, width: itemAbsoluteSize.x, height: itemAbsoluteSize.y }))
-    itemAbsolutePosition && setPosition((prevState) => ({ ...prevState, x: itemAbsolutePosition.x, y: itemAbsolutePosition.y }))
-
-  }, [containerSizeNoRenderRef, positionNoRenderRef, props.containerRef, sizeNoRenderRef, windowSize])
-
-  React.useEffect(() => {
-    const container = getRefParameters(props.containerRef);
-    if (!container.size) return;
-    const itemAbsolutePosition = changeResolution(props.position, props.containerResolution, container.size);
-    itemAbsolutePosition && setPosition((prevState) => ({ ...prevState, x: itemAbsolutePosition.x, y: itemAbsolutePosition.y }))
-
-  }, [props.containerRef, props.containerResolution, props.position])
-
-  React.useEffect(() => {
-    const container = getRefParameters(props.containerRef);
-    if (!container.size) return;
-    const itemAbsoluteSize = changeResolution({ x: props.relativeSize.width, y: props.relativeSize.height }, props.containerResolution, container.size);
-    itemAbsoluteSize && setSize((prevState) => ({ ...prevState, width: itemAbsoluteSize.x, height: itemAbsoluteSize.y }))
-
-  }, [props.containerRef, props.containerResolution, props.relativeSize])
-
-  const changeResolution = (base: Position, sourceRes: Size, targetRes: Size) => {
-    return {
-      x: base.x * (targetRes.width / sourceRes.width),
-      y: base.y * (targetRes.height / sourceRes.height)
-    }
-  }
-
-  const getRefParameters = (ref: React.RefObject<HTMLDivElement>) => {
-    if (!ref) return ({ size: null, position: null });
-    if (!ref.current) return ({ size: null, position: null });
-    const refRect = ref.current.getBoundingClientRect();
-
-    return ({
-      size: {
-        width: refRect.width,
-        height: refRect.height
-      },
-      position: {
-        x: refRect.x,
-        y: refRect.y
-      }
-    });
-  }
-
-  const getRelativeItemPosition = useCallback((absolutePosition: Position) => {
-    const container = getRefParameters(props.containerRef);
-    if (container.size) {
-      return changeResolution(absolutePosition, container.size, props.containerResolution);
-    }
-  }, [props.containerRef, props.containerResolution])
-
-  const onDrag = useCallback((e: DraggableEvent, d: DraggableData) => {
-    setPosition({ x: d.x, y: d.y })
-
-    if (onDragProp) {
-      const relativeItemPos = getRelativeItemPosition({ x: d.x, y: d.y });
-      relativeItemPos && onDragProp(props.id, relativeItemPos);
-    }
-  }, [getRelativeItemPosition, onDragProp, props.id])
-
-  const onStop = useCallback((e: DraggableEvent, d: DraggableData) => {
-    if (onDragStopProp) {
-      const relativeItemPos = getRelativeItemPosition({ x: d.x, y: d.y });
-      relativeItemPos && onDragStopProp(props.id, relativeItemPos);
-    }
-  }, [getRelativeItemPosition, onDragStopProp, props.id])
-
-  const onRotate = useCallback((e: RotatableEvent) => {
-    onRotateProp && onRotateProp(props.id, e.deg);
-  }, [onRotateProp, props.id]);
-
-  const onRotateStop = useCallback((e: RotatableEvent) => {
-    onRotateStopProp && onRotateStopProp(props.id, e.deg)
-  }, [onRotateStopProp, props.id]);
-
-  return (
-    <Draggable
-      bounds='parent'
-      nodeRef={ref as React.RefObject<HTMLDivElement>}
-      onDrag={onDrag}
-      onStop={onStop}
-      handle='.drag-handle'
-      position={position} >
-
-      <Rotatable ref={ref} rotation={props.rotation} onRotate={onRotate} onStop={onRotateStop}>
-        <div className='drag-handle' style={{ position: 'relative', width: size.width, height: size.height, background: 'red' }}></div>
-      </Rotatable>
-    </Draggable >
-  );
-});
-
-export default StreamOverlay;
+export default OverlayItem;

@@ -1,7 +1,10 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Size } from 'modules/types'
 
+interface Size {
+  width: number;
+  height: number;
+}
 
 export const useWindowSize = (props?: Size) => {
   const [windowSize, setWindowSize] = useState<Size | undefined>();
@@ -14,19 +17,18 @@ export const useWindowSize = (props?: Size) => {
       });
     }
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
 
     handleResize();
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return windowSize;
-}
+};
 
 export const useNoRenderRef = (currentValue: any) => {
   const ref = React.useRef(currentValue);
   ref.current = currentValue;
   return ref;
-}
-
+};
